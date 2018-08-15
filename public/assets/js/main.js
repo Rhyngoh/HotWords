@@ -1,4 +1,5 @@
 var db = firebase.database();
+var user = firebase.auth().currentUser;
 
 // Optional sign-in using google
 function signIn() {
@@ -23,7 +24,7 @@ function initFirebaseAuth() {
 }
 // return profile pic
 function getProfilePicUrl() {
-  return firebase.auth().currentUser.photoURL || '/public/assets/images/profile_placeholder.png';
+  return firebase.auth().currentUser.photoURL || 'assets/images/profile_placeholder.png';
 }
 
 // return signed in users name
@@ -34,6 +35,23 @@ function getUserName() {
 // check if user is signed-in
 function isUserSignedIn() {
   return !!firebase.auth().currentUser;
+}
+
+// Save messaging device token to datastore
+function saveMessagingDeviceToken() {
+  firebase.messaging().getToken().then(function(currentToken) {
+    if (currentToken) {
+      console.log('Got FCM device token:', currentToken);
+      // Saving the Device Token to the datastore.
+      firebase.database().ref('/fcmTokens').child(currentToken)
+          .set(firebase.auth().currentUser.uid);
+    } else {
+      // Need to request permissions to show notifications.
+      requestNotificationsPermissions();
+    }
+  }).catch(function(error){
+    console.error('Unable to get messaging token.', error);
+  });
 }
 
 // load chat message and listen for new messages
@@ -75,10 +93,10 @@ function onMessageFormSubmit(e) {
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) { // User is signed in!
+    console.log(user);
     // Get the signed-in user's profile pic and name.
     var profilePicUrl = getProfilePicUrl();
     var userName = getUserName();
-
     // Set the user's profile pic and name.
     userPicElement.style.backgroundImage = 'url(' + profilePicUrl + ')';
     userNameElement.textContent = userName;
@@ -90,10 +108,10 @@ function authStateObserver(user) {
 
     // Hide sign-in button.
     signInButtonElement.setAttribute('hidden', 'true');
-    //signInButtonAnon.setAttribute('hidden', 'true');
+    signInButtonAnon.setAttribute('hidden', 'true');
 
     // We save the Firebase Messaging Device token and enable notifications.
-    saveMessagingDeviceToken();
+    // saveMessagingDeviceToken();
   } else { // User is signed out!
     // Hide user's profile and sign-out button.
     userNameElement.setAttribute('hidden', 'true');
@@ -102,7 +120,7 @@ function authStateObserver(user) {
 
     // Show sign-in button.
     signInButtonElement.removeAttribute('hidden');
-    //signInButtonAnon.removeAttribute('hidden');
+    signInButtonAnon.removeAttribute('hidden');
   }
 }
 
@@ -196,6 +214,43 @@ function checkSetup() {
 // Checks that Firebase has been imported.
 checkSetup();
 
+var dialog = document.querySelector('dialog');
+var showDialogButton = document.querySelector('#sign-in-anonymous');
+if(!dialog.showModal) {
+  dialogPolyfill.registerDialog(dialog);
+}
+showDialogButton.addEventListener('click', function() {
+  dialog.showModal();
+});
+dialog.querySelector('.close').addEventListener('click', function() {
+  dialog.close();
+});
+dialog.querySelector('.accept').addEventListener('click', function() {
+  var inputuser = dialog.querySelector('#username').value;
+  firebase.auth().signInAnonymously()
+  .then(function(){
+    console.log(firebase.auth().currentUser);
+    firebase.auth().currentUser.updateProfile({
+      displayName: inputuser
+    })
+    .then(function() {
+      userNameElement.innerHTML = firebase.auth().currentUser.displayName;
+    })
+    .catch(function(err) {
+      console.error('Error updating anonymous user', err);
+    });
+  })
+  .then(function() {
+    return firebase.auth().currentUser;
+  })
+  .then(function() {
+    dialog.close();
+  })
+  .catch(function(error) {
+    console.error('Error signing in anonymously', error);
+  })
+})
+
 // Shortcuts to DOM Elements.
 var messageListElement = document.getElementById('messages');
 var messageFormElement = document.getElementById('message-form');
@@ -207,7 +262,7 @@ var mediaCaptureElement = document.getElementById('mediaCapture');
 var userPicElement = document.getElementById('user-pic');
 var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
-//var signInButtonAnon = document.getElementById('sign-in-anonymous');
+var signInButtonAnon = document.getElementById('sign-in-anonymous');
 var signOutButtonElement = document.getElementById('sign-out');
 var signInSnackbarElement = document.getElementById('must-signin-snackbar');
 
@@ -226,7 +281,3 @@ initFirebaseAuth();
 
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
-
-$(document).ready(function() {
-  alert('hello');
-})

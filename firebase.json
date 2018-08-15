@@ -17,7 +17,8 @@
       "firebase.json",
       "database-rules.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "firebase-debug.log"
     ],
     "rewrites": [
       {
