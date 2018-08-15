@@ -226,3 +226,7 @@ initFirebaseAuth();
 
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
+
+$(document).ready(function() {
+  alert('hello');
+})

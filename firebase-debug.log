@@ -262,3 +262,44 @@
 
 [debug] [2018-08-15T16:59:03.772Z] Parsing function triggers
 [info] i  functions: No HTTPS functions found. Use firebase functions:shell if you would like to emulate other types of functions.
+[debug] [2018-08-15T17:09:29.966Z] ----------------------------------------------------------------------
+[debug] [2018-08-15T17:09:29.967Z] Command:       D:\Program Files\nodejs\node.exe C:\Users\Ryan\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
+[debug] [2018-08-15T17:09:29.967Z] CLI Version:   4.0.3
+[debug] [2018-08-15T17:09:29.968Z] Platform:      win32
+[debug] [2018-08-15T17:09:29.968Z] Node Version:  v8.9.1
+[debug] [2018-08-15T17:09:29.968Z] Time:          Wed Aug 15 2018 12:09:29 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-15T17:09:29.968Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-08-15T17:09:29.975Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-08-15T17:09:29.976Z] > authorizing via signed-in user
+[debug] [2018-08-15T17:09:29.977Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/hotwords-1dcd8  
+  
+ Wed Aug 15 2018 12:09:29 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-15T17:09:30.273Z] <<< HTTP RESPONSE 200
+[debug] [2018-08-15T17:09:30.274Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/hotwords-1dcd8/tokens  
+  
+ Wed Aug 15 2018 12:09:30 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-15T17:09:30.557Z] <<< HTTP RESPONSE 200
+[debug] [2018-08-15T17:09:30.557Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/hotwords-1dcd8  
+  
+ Wed Aug 15 2018 12:09:30 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-15T17:09:30.728Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from 'C:\Users\Ryan\Coding\HotWords'...
+[info] 
+[info] i  functions: Preparing to emulate functions.
+[debug] [2018-08-15T17:09:31.378Z] Fetching environment
+[debug] [2018-08-15T17:09:31.381Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/581836809610:getServerAppConfig  
+  
+ Wed Aug 15 2018 12:09:31 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-15T17:09:31.381Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/581836809610/clients/_:getWebAppConfig  
+  
+ Wed Aug 15 2018 12:09:31 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-15T17:09:31.620Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: public
+[info] +  hosting: Local server: http://localhost:5000
+
+[debug] [2018-08-15T17:09:31.640Z] <<< HTTP RESPONSE 200
+[debug] [2018-08-15T17:09:31.641Z] Starting @google-cloud/functions-emulator
+[debug] [2018-08-15T17:09:33.216Z] Parsing function triggers
+[info] i  functions: No HTTPS functions found. Use firebase functions:shell if you would like to emulate other types of functions.
