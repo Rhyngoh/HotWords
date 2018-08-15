@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "hotwords-1dcd8"
+    "default": "hotwords-1dcd8",
+    "hotwords": "hotwords-1dcd8"
   }
 }
