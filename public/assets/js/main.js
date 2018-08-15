@@ -11,12 +11,12 @@ function signOut() {
   firebase.auth().signOut();
 }
 
-function signInAnon() {
-  firebase.auth().signInAnonymously()
-  .catch(function(error) {
-    console.error('Error signing in anonymously', error);
-  })
-}
+// function signInAnon() {
+//   firebase.auth().signInAnonymously()
+//   .catch(function(error) {
+//     console.error('Error signing in anonymously', error);
+//   })
+// }
 // Initiate firebase auth
 function initFirebaseAuth() {
   firebase.auth().onAuthStateChanged(authStateObserver);
@@ -90,7 +90,7 @@ function authStateObserver(user) {
 
     // Hide sign-in button.
     signInButtonElement.setAttribute('hidden', 'true');
-    signInButtonAnon.setAttribute('hidden', 'true');
+    //signInButtonAnon.setAttribute('hidden', 'true');
 
     // We save the Firebase Messaging Device token and enable notifications.
     saveMessagingDeviceToken();
@@ -102,7 +102,7 @@ function authStateObserver(user) {
 
     // Show sign-in button.
     signInButtonElement.removeAttribute('hidden');
-    signInButtonAnon.removeAttribute('hidden');
+    //signInButtonAnon.removeAttribute('hidden');
   }
 }
 
@@ -207,7 +207,7 @@ var mediaCaptureElement = document.getElementById('mediaCapture');
 var userPicElement = document.getElementById('user-pic');
 var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
-var signInButtonAnon = document.getElementById('sign-in-anonymous');
+//var signInButtonAnon = document.getElementById('sign-in-anonymous');
 var signOutButtonElement = document.getElementById('sign-out');
 var signInSnackbarElement = document.getElementById('must-signin-snackbar');
 
@@ -215,7 +215,7 @@ var signInSnackbarElement = document.getElementById('must-signin-snackbar');
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', signOut);
 signInButtonElement.addEventListener('click', signIn);
-signInButtonAnon.addEventListener('click', signInAnon);
+//signInButtonAnon.addEventListener('click', signInAnon);
 
 // Toggle for the button.
 messageInputElement.addEventListener('keyup', toggleButton);
