@@ -82,9 +82,14 @@
       </header>
 
       <main class="mdl-layout__content mdl-color--grey-100">
+        <div class="mdl-cell mdl-cell--12-col mdl-grid">
+          <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
+            Game
+          </div>
+        </div>
         <div id="messages-card-container" class="mdl-cell mdl-cell--12-col mdl-grid">
           <!-- Messages container -->
-          <div id="messages-card" class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--6-col-tablet mdl-cell--6-col-desktop">
+          <div id="messages-card" class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--8-col-tablet mdl-cell--8-col-desktop">
             <div class="mdl-card__supporting-text mdl-color-text--grey-600">
               <div id="messages">
                 <span id="message-filler"></span>
@@ -106,13 +111,19 @@
               </form> -->
             </div>
           </div>
-
           <div id="must-signin-snackbar" class="mdl-js-snackbar mdl-snackbar">
             <div class="mdl-snackbar__text"></div>
             <button class="mdl-snackbar__action" type="button"></button>
           </div>
 
+          <div id="userlist-card" class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--4-col-tablet mdl-cell--4-col-desktop">
+            <span>User List:</span>
+            <ul id="userlist-ul">
+              <li>Yes</li>
+            </ul>
+          </div>
         </div>
+
       </main>
     </div>
     <!-- update the version number as needed -->

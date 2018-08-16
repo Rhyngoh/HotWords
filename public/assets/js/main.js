@@ -1,10 +1,21 @@
 var db = firebase.database();
 var user = firebase.auth().currentUser;
+var currentRef;
 
 // Optional sign-in using google
 function signIn() {
-  var provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider);
+  //Set Persistence to session, if uses close it will sign them out
+  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+  .then(function() {
+    var provider = new firebase.auth.GoogleAuthProvider();
+    return firebase.auth().signInWithPopup(provider);
+  })
+  .then(function() {
+    addToOnlineList(getUserID(), getUserName());
+  })
+  .catch(function(error){
+    console.error('Error signing in with Google', error);
+  });
 }
 
 // Sign out of firebase
@@ -12,12 +23,6 @@ function signOut() {
   firebase.auth().signOut();
 }
 
-// function signInAnon() {
-//   firebase.auth().signInAnonymously()
-//   .catch(function(error) {
-//     console.error('Error signing in anonymously', error);
-//   })
-// }
 // Initiate firebase auth
 function initFirebaseAuth() {
   firebase.auth().onAuthStateChanged(authStateObserver);
@@ -30,6 +35,10 @@ function getProfilePicUrl() {
 // return signed in users name
 function getUserName() {
   return firebase.auth().currentUser.displayName;
+}
+
+function getUserID() {
+  return firebase.auth().currentUser.uid;
 }
 
 // check if user is signed-in
@@ -76,6 +85,17 @@ function saveMessage(messageText) {
   });
 }
 
+function addToOnlineList(uuid, username) {
+  currentRef = '/online/' + uuid;
+  return db.ref(currentRef).push({
+    name: username,
+    uid: uuid
+  })
+  .catch(function(error) {
+    console.error('Error adding to online list', error);
+  });
+}
+
 // Triggered when the send new message form is submitted.
 function onMessageFormSubmit(e) {
   e.preventDefault();
@@ -89,7 +109,52 @@ function onMessageFormSubmit(e) {
     });
   }
 }
+function refreshUserList() {
+  var callback = function(snap) {
+    var data = snap.val();
+    console.log(data);
+    if(currentRef !== undefined) {
+      db.ref(currentRef).onDisconnect().remove();
+    }
+    
+  }
+  db.ref('/online/').on('child_added', callback);
+  db.ref('/online/').on('child_removed', callback);
+}
 
+function displayMessage(key, name, text, picUrl, imageUrl) {
+  var div = document.getElementById(key);
+  // If an element for that message does not exists yet we create it.
+  if (!div) {
+    var container = document.createElement('div');
+    container.innerHTML = MESSAGE_TEMPLATE;
+    div = container.firstChild;
+    div.setAttribute('id', key);
+    messageListElement.appendChild(div);
+  }
+  if (picUrl) {
+    div.querySelector('.pic').style.backgroundImage = 'url(' + picUrl + ')';
+  }
+  div.querySelector('.name').textContent = name;
+  var messageElement = div.querySelector('.message');
+  if (text) { // If the message is text.
+    messageElement.textContent = text;
+    // Replace all line breaks by <br>.
+    messageElement.innerHTML = messageElement.innerHTML.replace(/\n/g, '<br>');
+  } else if (imageUrl) { // If the message is an image.
+    var image = document.createElement('img');
+    image.addEventListener('load', function() {
+      messageListElement.scrollTop = messageListElement.scrollHeight;
+    });
+    image.src = imageUrl + '&' + new Date().getTime();
+    messageElement.innerHTML = '';
+    messageElement.appendChild(image);
+  }
+  // Show the card fading-in and scroll to view the new message.
+  setTimeout(function() {div.classList.add('visible')}, 1);
+  messageListElement.scrollTop = messageListElement.scrollHeight;
+  messageInputElement.focus();
+}
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) { // User is signed in!
@@ -114,6 +179,10 @@ function authStateObserver(user) {
     // saveMessagingDeviceToken();
   } else { // User is signed out!
     // Hide user's profile and sign-out button.
+
+    if(currentRef !== undefined){
+      db.ref(currentRef).remove();
+    }
     userNameElement.setAttribute('hidden', 'true');
     userPicElement.setAttribute('hidden', 'true');
     signOutButtonElement.setAttribute('hidden', 'true');
@@ -227,27 +296,33 @@ dialog.querySelector('.close').addEventListener('click', function() {
 });
 dialog.querySelector('.accept').addEventListener('click', function() {
   var inputuser = dialog.querySelector('#username').value;
-  firebase.auth().signInAnonymously()
-  .then(function(){
-    console.log(firebase.auth().currentUser);
-    firebase.auth().currentUser.updateProfile({
-      displayName: inputuser
+  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+  .then(function() {
+    firebase.auth().signInAnonymously()
+    .then(function(){
+      console.log(firebase.auth().currentUser);
+      firebase.auth().currentUser.updateProfile({
+        displayName: inputuser
+      })
+      .then(function() {
+        userNameElement.innerHTML = firebase.auth().currentUser.displayName;
+      })
+      .then(function() {
+        addToOnlineList(getUserID(), getUserName());
+      })
+      .catch(function(err) {
+        console.error('Error updating anonymous user', err);
+      });
     })
     .then(function() {
-      userNameElement.innerHTML = firebase.auth().currentUser.displayName;
+      return firebase.auth().currentUser;
     })
-    .catch(function(err) {
-      console.error('Error updating anonymous user', err);
-    });
-  })
-  .then(function() {
-    return firebase.auth().currentUser;
-  })
-  .then(function() {
-    dialog.close();
-  })
-  .catch(function(error) {
-    console.error('Error signing in anonymously', error);
+    .then(function() {
+      dialog.close();
+    })
+    .catch(function(error) {
+      console.error('Error signing in anonymously', error);
+    })
   })
 })
 
@@ -281,3 +356,4 @@ initFirebaseAuth();
 
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
+refreshUserList();

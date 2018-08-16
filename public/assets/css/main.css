@@ -12,6 +12,19 @@ main, #messages-card {
 #messages-card {
   margin-top: 15px;
 }
+#userlist-card {
+  margin-top: 15px;
+  padding: 8px;
+}
+#userlist-card span {
+  font-size: 1.5rem;
+}
+#userlist-ul {
+  height: 100%;
+  overflow: auto;
+  overflow-x: hidden;
+}
+
 .mdl-layout__header-row span {
   margin-left: 15px;
   margin-top: 17px;
@@ -106,6 +119,7 @@ main, #messages-card {
 }
 .mdl-card {
   min-height: 0;
+  max-height: 300px;
 }
 .mdl-card {
   background: linear-gradient(white, #f9f9f9);
