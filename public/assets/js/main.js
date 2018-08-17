@@ -109,55 +109,27 @@ function onMessageFormSubmit(e) {
     });
   }
 }
+
 function refreshUserList() {
-  var callback = function(snap) {
-    var data = snap.val();
-    console.log(data);
+  db.ref('/online/').on('value', function(snap) {
     if(currentRef !== undefined) {
       db.ref(currentRef).onDisconnect().remove();
     }
-  }
-  db.ref('/online/').on('child_added', callback);
-  db.ref('/online/').on('child_removed', callback);
+    userListElement.innerHTML = '';
+    snap.forEach(function(childSnap) {
+      var childData = childSnap.val();
+      var childName = childData[Object.keys(childData)[0]].name;
+      var newLI = document.createElement("LI");
+      var textnode = document.createTextNode(childName);
+      newLI.appendChild(textnode);
+      userListElement.appendChild(newLI);
+    })
+  });
 }
 
-// function displayMessage(key, name, text, picUrl, imageUrl) {
-//   var div = document.getElementById(key);
-//   // If an element for that message does not exists yet we create it.
-//   if (!div) {
-//     var container = document.createElement('div');
-//     container.innerHTML = MESSAGE_TEMPLATE;
-//     div = container.firstChild;
-//     div.setAttribute('id', key);
-//     messageListElement.appendChild(div);
-//   }
-//   if (picUrl) {
-//     div.querySelector('.pic').style.backgroundImage = 'url(' + picUrl + ')';
-//   }
-//   div.querySelector('.name').textContent = name;
-//   var messageElement = div.querySelector('.message');
-//   if (text) { // If the message is text.
-//     messageElement.textContent = text;
-//     // Replace all line breaks by <br>.
-//     messageElement.innerHTML = messageElement.innerHTML.replace(/\n/g, '<br>');
-//   } else if (imageUrl) { // If the message is an image.
-//     var image = document.createElement('img');
-//     image.addEventListener('load', function() {
-//       messageListElement.scrollTop = messageListElement.scrollHeight;
-//     });
-//     image.src = imageUrl + '&' + new Date().getTime();
-//     messageElement.innerHTML = '';
-//     messageElement.appendChild(image);
-//   }
-//   // Show the card fading-in and scroll to view the new message.
-//   setTimeout(function() {div.classList.add('visible')}, 1);
-//   messageListElement.scrollTop = messageListElement.scrollHeight;
-//   messageInputElement.focus();
-// }
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) { // User is signed in!
-    console.log(user);
     // Get the signed-in user's profile pic and name.
     var profilePicUrl = getProfilePicUrl();
     var userName = getUserName();
