@@ -70,13 +70,14 @@ function loadMessages() {
     displayMessage(snap.key, data.name, data.text, data.profilePicUrl, data.imageUrl);
   };
 
-  db.ref('/messages/').limitToLast(12).on('child_added', callback);
-  db.ref('/messages/').limitToLast(12).on('child_changed', callback);
+  db.ref('/messages/').limitToLast(100).on('child_added', callback);
+  db.ref('/messages/').limitToLast(100).on('child_changed', callback);
 }
 
 // Saves a new message on the Firebase DB.
 function saveMessage(messageText) {
   return db.ref('/messages/').push({
+    key: getUserID(),
     name: getUserName(),
     text: messageText,
     profilePicUrl: getProfilePicUrl()
