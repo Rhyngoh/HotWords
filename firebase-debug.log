@@ -180,3 +180,103 @@
 
 [debug] [2018-08-16T19:39:57.711Z] Parsing function triggers
 [info] i  functions: No HTTPS functions found. Use firebase functions:shell if you would like to emulate other types of functions.
+[debug] [2018-08-16T22:29:49.072Z] ----------------------------------------------------------------------
+[debug] [2018-08-16T22:29:49.073Z] Command:       D:\Program Files\nodejs\node.exe C:\Users\Ryan\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
+[debug] [2018-08-16T22:29:49.073Z] CLI Version:   4.0.3
+[debug] [2018-08-16T22:29:49.073Z] Platform:      win32
+[debug] [2018-08-16T22:29:49.073Z] Node Version:  v8.9.1
+[debug] [2018-08-16T22:29:49.073Z] Time:          Thu Aug 16 2018 17:29:49 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-16T22:29:49.073Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-08-16T22:29:49.082Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-08-16T22:29:49.083Z] > authorizing via signed-in user
+[debug] [2018-08-16T22:29:49.084Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2018-08-16T22:29:49.084Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ { refresh_token: '1/YimI60Zd_KPk18kwlqSkM3tdwYWiYQ-OVShuCPZJYNc',
+  client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com',
+  client_secret: 'j9iVZfS8kkCEFUPaAeJV0sAi',
+  grant_type: 'refresh_token',
+  scope: 'email https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/cloudplatformprojects.readonly https://www.googleapis.com/auth/firebase openid' } 
+ Thu Aug 16 2018 17:29:49 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-16T22:29:49.216Z] <<< HTTP RESPONSE 200
+[debug] [2018-08-16T22:29:49.242Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/hotwords-1dcd8  
+  
+ Thu Aug 16 2018 17:29:49 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-16T22:29:49.512Z] <<< HTTP RESPONSE 200
+[debug] [2018-08-16T22:29:49.512Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/hotwords-1dcd8/tokens  
+  
+ Thu Aug 16 2018 17:29:49 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-16T22:29:49.881Z] <<< HTTP RESPONSE 200
+[debug] [2018-08-16T22:29:49.881Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/hotwords-1dcd8  
+  
+ Thu Aug 16 2018 17:29:49 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-16T22:29:50.067Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from 'C:\Users\Ryan\Coding\HotWords'...
+[info] 
+[info] i  functions: Preparing to emulate functions.
+[debug] [2018-08-16T22:29:50.710Z] Fetching environment
+[debug] [2018-08-16T22:29:50.714Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/581836809610:getServerAppConfig  
+  
+ Thu Aug 16 2018 17:29:50 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-16T22:29:50.714Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/581836809610/clients/_:getWebAppConfig  
+  
+ Thu Aug 16 2018 17:29:50 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-16T22:29:50.972Z] <<< HTTP RESPONSE 200
+[debug] [2018-08-16T22:29:50.973Z] Starting @google-cloud/functions-emulator
+[debug] [2018-08-16T22:29:51.088Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: public
+[info] +  hosting: Local server: http://localhost:5000
+
+[debug] [2018-08-16T22:29:52.532Z] Parsing function triggers
+[info] i  functions: No HTTPS functions found. Use firebase functions:shell if you would like to emulate other types of functions.
+[debug] [2018-08-16T23:47:02.051Z] ----------------------------------------------------------------------
+[debug] [2018-08-16T23:47:02.052Z] Command:       D:\Program Files\nodejs\node.exe C:\Users\Ryan\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
+[debug] [2018-08-16T23:47:02.053Z] CLI Version:   4.0.3
+[debug] [2018-08-16T23:47:02.053Z] Platform:      win32
+[debug] [2018-08-16T23:47:02.053Z] Node Version:  v8.9.1
+[debug] [2018-08-16T23:47:02.053Z] Time:          Thu Aug 16 2018 18:47:02 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-16T23:47:02.053Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-08-16T23:47:02.060Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-08-16T23:47:02.060Z] > authorizing via signed-in user
+[debug] [2018-08-16T23:47:02.062Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2018-08-16T23:47:02.062Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ { refresh_token: '1/YimI60Zd_KPk18kwlqSkM3tdwYWiYQ-OVShuCPZJYNc',
+  client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com',
+  client_secret: 'j9iVZfS8kkCEFUPaAeJV0sAi',
+  grant_type: 'refresh_token',
+  scope: 'email https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/cloudplatformprojects.readonly https://www.googleapis.com/auth/firebase openid' } 
+ Thu Aug 16 2018 18:47:02 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-16T23:47:02.206Z] <<< HTTP RESPONSE 200
+[debug] [2018-08-16T23:47:02.222Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/hotwords-1dcd8  
+  
+ Thu Aug 16 2018 18:47:02 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-16T23:47:02.518Z] <<< HTTP RESPONSE 200
+[debug] [2018-08-16T23:47:02.519Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/hotwords-1dcd8/tokens  
+  
+ Thu Aug 16 2018 18:47:02 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-16T23:47:02.882Z] <<< HTTP RESPONSE 200
+[debug] [2018-08-16T23:47:02.883Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/hotwords-1dcd8  
+  
+ Thu Aug 16 2018 18:47:02 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-16T23:47:03.066Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from 'C:\Users\Ryan\Coding\HotWords'...
+[info] 
+[info] i  functions: Preparing to emulate functions.
+[debug] [2018-08-16T23:47:03.680Z] Fetching environment
+[debug] [2018-08-16T23:47:03.682Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/581836809610:getServerAppConfig  
+  
+ Thu Aug 16 2018 18:47:03 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-16T23:47:03.682Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/581836809610/clients/_:getWebAppConfig  
+  
+ Thu Aug 16 2018 18:47:03 GMT-0500 (Central Daylight Time)
+[debug] [2018-08-16T23:47:03.975Z] <<< HTTP RESPONSE 200
+[debug] [2018-08-16T23:47:03.975Z] Starting @google-cloud/functions-emulator
+[debug] [2018-08-16T23:47:04.020Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: public
+[info] +  hosting: Local server: http://localhost:5000
+
+[debug] [2018-08-16T23:47:05.536Z] Parsing function triggers
+[info] i  functions: No HTTPS functions found. Use firebase functions:shell if you would like to emulate other types of functions.
