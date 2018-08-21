@@ -84,7 +84,14 @@
       <main class="mdl-layout__content mdl-color--grey-100">
         <div id="game-container" class="mdl-cell mdl-cell--12-col mdl-grid">
           <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
-            Game
+            <button id="start-game" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+              Start Game
+            </button>
+            <div id="letter-container" hidden>
+            </div>
+            <h1 id="timer" hidden>60</h1>
+            <div id="winner-container" hidden>
+            </div>
           </div>
         </div>
         <div id="messages-card-container" class="mdl-cell mdl-cell--12-col mdl-grid">
@@ -103,12 +110,6 @@
                   Send
                 </button>
               </form>
-              <!-- <form id="image-form" action="#">
-                <input id="mediaCapture" type="file" accept="image/*" capture="camera">
-                <button id="submitImage" title="Add an image" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--amber-400 mdl-color-text--white">
-                  <i class="material-icons">image</i>
-                </button>
-              </form> -->
             </div>
           </div>
           <div id="must-signin-snackbar" class="mdl-js-snackbar mdl-snackbar">
@@ -136,19 +137,5 @@
     <script src="/__/firebase/init.js"></script>
     
     <script type="text/javascript" src="./assets/js/main.js"></script>
-    <!-- <script>
-      $("#sign-in-anonymous").click(function() {
-        showDialog({
-          title: 'Input name',
-          text: 'Text Box',
-          negative: {
-            title: 'Cancel'
-          },
-          positive: {
-            title: 'Accept'
-          }
-        })
-      });
-      </script> -->
   </body>
 </html>

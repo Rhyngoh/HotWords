@@ -45,7 +45,182 @@ function getUserID() {
 function isUserSignedIn() {
   return !!firebase.auth().currentUser;
 }
+function generateLetters() {
+  var letters = [];
+  var possibleLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var possibleVowels = "AEIOU";
+  var possibleConsonants = "BCDFGHJKLMNPQRSTVWXYZ";
 
+  for(var i = 0; i < 5; i++){
+    letters.push(possibleLetters.charAt(Math.floor(Math.random() * possibleLetters.length)));
+  }
+  for(var j = 0; j < 2; j++){
+    letters.push(possibleVowels.charAt(Math.floor(Math.random() * possibleVowels.length)));
+  }
+  for(var k = 0; k < 2; k++){
+    letters.push(possibleConsonants.charAt(Math.floor(Math.random() * possibleConsonants.length)));
+  }
+  console.log(letters);
+  return letters;
+}
+// Global random array so don't have to query db every time to check for this array
+var randomArray = [];
+var gameOngoing;
+function startGame() {
+  randomArray = generateLetters();
+  var ref = db.ref('/GlobalGame/');
+  ref.child('gameOngoing').set(true);
+  ref.child('timer').set(60);
+  ref.child('randomLetters').set(randomArray);
+  db.ref('/validWords/').remove()
+    .then(function() {
+      console.log('Removed valid Words db');
+    })
+    .catch(function(err) {
+      console.error('Remove failed: ', err);
+    })
+  startTimer(60);
+}
+
+function startTimer(timeLeft) {
+  var timerRef = db.ref('/GlobalGame/timer/');
+  var gameOngoingRef = db.ref('/GlobalGame/gameOngoing/');
+  var gameTimer = setInterval(function() {
+    timeLeft--;
+    timerRef.set(timeLeft);
+    // During game, check if message is 1 string, then check if letters are part of array
+    if(timeLeft <= 0){
+      clearInterval(gameTimer);
+      console.log('clear interval');
+    }
+  }, 1000);
+}
+
+function gameUpdate() {
+  var ref = db.ref('/GlobalGame/');
+  var timerRef = db.ref('/GlobalGame/timer/');
+  var gameOngoingRef = db.ref('/GlobalGame/gameOngoing/');
+  var randomLetterRef = db.ref('/GlobalGame/randomLetters/');
+  var timeLeft;
+  randomLetterRef.on('value', function(snap) {
+    randomStringElement.innerHTML = '';
+    randomArray = snap.val();
+    console.log(snap.val());
+    for(var i = 0; i < randomArray.length; i++) {
+      var randomLetter = document.createElement('div');
+      randomLetter.innerHTML = randomArray[i];
+      randomStringElement.appendChild(randomLetter);
+    }
+  });
+  ref.once('value').then(function(snap){
+    console.log(snap.val().gameOngoing);
+    if(snap.val().gameOngoing == true) {
+      timeLeft = snap.val().timer;
+      startGameElement.hidden = true;
+      timerElement.hidden = false;
+      randomStringElement.hidden = false;
+      gameOngoing = true;
+    } else {
+      startGameElement.hidden = false;
+      timerElement.hidden = true;
+      randomStringElement.hidden = true;
+      gameOngoing = false;
+    }
+  });
+  gameOngoingRef.on('value', function(snap) {
+    if(snap.val() == true) {
+      startGameElement.hidden = true;
+      timerElement.hidden = false;
+      randomStringElement.hidden = false;
+      gameOngoing = true;
+    } else {
+      startGameElement.hidden = false;
+      timerElement.hidden = true;
+      randomStringElement.hidden = true;
+      gameOngoing = false;
+    }
+  });
+  timerRef.on('value', function(snap) {
+    // var data = snap.val();
+    timeLeft = snap.val();
+    timerElement.textContent = timeLeft;
+    if(timeLeft > 1) {
+      startTimer(timeLeft);
+    }else {
+      timerElement.innerHTML = 'GAME OVER';
+      gameOngoingRef.set(false);
+    }
+  });
+}
+function calculateWinner() {
+  winnerElement.hidden = false;
+  var ref = db.ref('/validWords/');
+  //ref.orderByValue().limitToLast(1).once('value', function(snap) {
+
+    // var upperMsg = msg.toUpperCase();
+    // if(!snap.hasChild(upperMsg)) {
+    //   ref.child(upperMsg).set({
+    //     key: getUserID(),
+    //     name: getUserName(),
+    //     text: upperMsg
+    //   })
+    // } else {
+    //   console.log('Word is already in db');
+    //   var alreadySubmittedSnackbar = {
+    //     message: msg + ' has already been submitted, Try another word!',
+    //     timeout: 2000
+    //   };
+    //   signInSnackbarElement.MaterialSnackbar.showSnackbar(alreadySubmittedSnackbar);
+    // }
+  //})
+  var winner = '';
+  winnerElement.innerHTML = '';
+}
+
+function validWord(msg) {
+  var word = msg.toUpperCase().split('');
+  console.log(word);
+  for(var i = 0; i < word.length; i++) {
+    console.log(randomArray.includes(word[i]));
+    if(!randomArray.includes(word[i])) {
+      console.log('letters arent valid');
+      var invalidLettersSnackbar = {
+        message: "Answers must use the letters provided, Try Again!",
+        timeout: 2000
+      };
+      signInSnackbarElement.MaterialSnackbar.showSnackbar(invalidLettersSnackbar);
+      return false;
+    } else {
+      var repeatedLetter = word.some(function(current, index, array) {
+        console.log(current + ' : ' + array[index]);
+        return array.lastIndexOf(current) != index;
+      });
+      console.log(repeatedLetter);
+      if(repeatedLetter == true) {
+        console.log('There is a repeated letter');
+        var repeatedLetterSnackBar = {
+          message: "Answers cannot have repeated letters, Try Again!",
+          timeout: 2000
+        };
+        signInSnackbarElement.MaterialSnackbar.showSnackbar(repeatedLetterSnackBar);
+        return false;
+      } else {
+        console.log('No repeated letter');
+        return true;
+      }
+    }
+  }
+  return true;
+}
+function repeatedLetters(text, index) {
+  if((text.length - index) == 0) {
+    return false;
+  } else {
+    console.log(repeatedLetters(text, index + 1));
+    console.log(text.substr(0, index).indexOf(text[index]));
+    return repeatedLetters(text, index + 1) || text.substr(0, index).indexOf(text[index])!=-1;
+  }
+}
 // Save messaging device token to datastore
 function saveMessagingDeviceToken() {
   firebase.messaging().getToken().then(function(currentToken) {
@@ -97,13 +272,72 @@ function addToOnlineList(uuid, username) {
   });
 }
 
+// function addToValidList(msg) {
+//   return db.ref('/validWords/').push({
+//     key: getUserID(),
+//     name: getUserName(),
+//     text: msg
+//   })
+//   .then(function() {
+//     console.log('ADDED TO VALID LIST', msg);
+//   }).catch(function(error) {
+//     console.error('Error adding to valid Word database', error);
+//   })
+// }
+
+function alreadySubmitted(msg) {
+  var userRef = 'validWords/' + getUserName();
+  var ref = db.ref(userRef);
+  console.log(ref);
+  ref.once('value', function(snap) {
+    var upperMsg = msg.toUpperCase();
+    if(!snap.hasChild(upperMsg)) {
+      ref.child(upperMsg).set({
+        key: getUserID(),
+        name: getUserName(),
+        text: upperMsg
+      })
+    } else {
+      console.log('Word is already in db');
+      var alreadySubmittedSnackbar = {
+        message: msg + ' has already been submitted, Try another word!',
+        timeout: 2000
+      };
+      signInSnackbarElement.MaterialSnackbar.showSnackbar(alreadySubmittedSnackbar);
+    }
+  })
+}
 // Triggered when the send new message form is submitted.
 function onMessageFormSubmit(e) {
   e.preventDefault();
+  var message = messageInputElement.value;
   // Check that the user entered a message and is signed in.
-  if (messageInputElement.value && checkSignedInWithMessage()) {
-    console.log(messageInputElement.value);
-    saveMessage(messageInputElement.value).then(function() {
+  if (message && checkSignedInWithMessage()) {
+    // Check if gaming is running
+    if(gameOngoing == true) {
+      console.log('Game ongoing');
+      //Check if string is one word (no spaces)
+      if(message.includes(' ') == false) {
+        console.log('No spaces!');
+        console.log(validWord(message));
+        if(validWord(message) == true) {
+          console.log(message);
+          console.log('valid word');
+          alreadySubmitted(message);
+        }else {
+          console.log('not valid');
+        }
+      }else{
+        console.log('I HAVE A SPACE');
+        var spaceSnackbar = {
+          message: "Answers can't have any spaces, Try Again!",
+          timeout: 2000
+        };
+        signInSnackbarElement.MaterialSnackbar.showSnackbar(spaceSnackbar);
+      }
+    }
+    console.log(message);
+    saveMessage(message).then(function() {
       // Clear message text field and re-enable the SEND button.
       resetMaterialTextfield(messageInputElement);
       toggleButton();
@@ -313,8 +547,12 @@ var signInButtonElement = document.getElementById('sign-in');
 var signInButtonAnon = document.getElementById('sign-in-anonymous');
 var signOutButtonElement = document.getElementById('sign-out');
 var signInSnackbarElement = document.getElementById('must-signin-snackbar');
-
+var startGameElement = document.getElementById('start-game');
+var randomStringElement = document.getElementById('letter-container');
+var timerElement = document.getElementById('timer');
+var winnerElement = document.getElementById('winner-container');
 // Saves message on form submit.
+startGameElement.addEventListener('click', startGame);
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', signOut);
 signInButtonElement.addEventListener('click', signIn);
@@ -330,3 +568,4 @@ initFirebaseAuth();
 // We load currently existing chat messages and listen to new ones.
 loadMessages();
 refreshUserList();
+gameUpdate();
