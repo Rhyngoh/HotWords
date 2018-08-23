@@ -73,21 +73,7 @@ function startGame() {
   ref.child('gameOngoing').set(true);
   ref.child('timer').set(60);
   ref.child('randomLetters').set(randomArray);
-  db.ref('/validWords/').remove()
-    .then(function() {
-      console.log('Removed valid Words db');
-    })
-    .catch(function(err) {
-      console.error('Remove failed: ', err);
-    });
-  db.ref('/Words/').remove()
-    .then(function() {
-      console.log('Removed Words');
-    });
-  var floatingText = document.getElementsByClassName('floating-text');
-  while(floatingText.length > 0) {
-    floatingText[0].parentNode.removeChild(floatingText[0]);
-  }
+  ref.child('restartGame').set(true);
   startTimer(60);
 }
 
@@ -115,6 +101,7 @@ function gameUpdate() {
   var timerRef = db.ref('/GlobalGame/timer/');
   var gameOngoingRef = db.ref('/GlobalGame/gameOngoing/');
   var randomLetterRef = db.ref('/GlobalGame/randomLetters/');
+  var restartGameRef = db.ref('/GlobalGame/restartGame/');
   var timeLeft;
   randomLetterRef.on('value', function(snap) {
     randomStringElement.innerHTML = '';
@@ -156,6 +143,7 @@ function gameUpdate() {
       randomStringElement.hidden = false;
       winnerElement.hidden = true;
       gameOngoing = true;
+
     } else {
       startGameElement.hidden = false;
       timerElement.hidden = true;
@@ -163,6 +151,12 @@ function gameUpdate() {
       winnerElement.hidden = false;
       gameOngoing = false;
       calculateWinner();
+    }
+  });
+  restartGameRef.on('value', function(snap) {
+    if(snap.val() == true) {
+      restartGame();
+      restartGameRef.set(false);
     }
   });
   // For every time tick, update screen
@@ -182,6 +176,23 @@ function gameUpdate() {
       startTimer(timeLeft);
     }
   })
+}
+function restartGame() {
+  db.ref('/validWords/').remove()
+    .then(function() {
+      console.log('Removed valid Words db');
+    })
+    .catch(function(err) {
+      console.error('Remove failed: ', err);
+    });
+  db.ref('/Words/').remove()
+    .then(function() {
+      console.log('Removed Words');
+    });
+  var floatingText = document.getElementsByClassName('floating-text');
+  while(floatingText.length > 0) {
+    floatingText[0].parentNode.removeChild(floatingText[0]);
+  }
 }
 function calculateWinner() {
   var winner;
