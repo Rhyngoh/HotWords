@@ -66,6 +66,8 @@ function generateLetters() {
 // Global random array so don't have to query db every time to check for this array
 var randomArray = [];
 var gameOngoing;
+
+// db.ref().remove().then(function() { console.log('remove'); });
 function startGame() {
   randomArray = generateLetters();
   var ref = db.ref('/GlobalGame/');
@@ -78,7 +80,15 @@ function startGame() {
     })
     .catch(function(err) {
       console.error('Remove failed: ', err);
-    })
+    });
+  db.ref('/Words/').remove()
+    .then(function() {
+      console.log('Removed Words');
+    });
+  var floatingText = document.getElementsByClassName('floating-text');
+  while(floatingText.length > 0) {
+    floatingText[0].parentNode.removeChild(floatingText[0]);
+  }
   startTimer(60);
 }
 
@@ -95,7 +105,13 @@ function startTimer(timeLeft) {
     }
   }, 1000);
 }
-
+function getRandomPosition(element) {
+  var x = document.getElementById('game-container').clientWidth - 150;
+  var y = document.getElementById('game-container').clientHeight - 125;
+  var randomX = Math.floor(Math.random()*x);
+  var randomY = 100 + Math.floor(Math.random()*y);
+  return [randomX, randomY];
+}
 function gameUpdate() {
   var ref = db.ref('/GlobalGame/');
   var timerRef = db.ref('/GlobalGame/timer/');
@@ -112,6 +128,28 @@ function gameUpdate() {
       randomStringElement.appendChild(randomLetter);
     }
   });
+  db.ref('/Words/').on('child_added', function(snap) {
+    console.log(snap);
+    console.log(snap.val());
+    console.log(snap.val().text);
+    var floatingText = document.createElement('div');
+    floatingText.classList.add('floating-text');
+    floatingText.innerHTML = snap.val().text;
+    gameElement.appendChild(floatingText);
+    var xy = getRandomPosition(floatingText);
+    floatingText.style.left = xy[0] + 'px';
+    floatingText.style.top = xy[1] + 'px';
+
+  });
+  // db.ref('/Words/').once('value').then(function(snap) {
+  //   snap.forEach(function(childSnap) {
+  //     console.log(childSnap.val().text);
+  //     var floatingText = document.createElement('div');
+  //     floatingText.classList.add('floating-text');
+  //     floatingText.innerHTML = snap.val().text;
+  //     gameElement.appendChild(floatingText);
+  //   })
+  // });
   ref.once('value').then(function(snap){
     console.log(snap.val().gameOngoing);
     if(snap.val().gameOngoing == true) {
@@ -128,62 +166,155 @@ function gameUpdate() {
     }
   });
   gameOngoingRef.on('value', function(snap) {
+    console.log(snap.val());
     if(snap.val() == true) {
       startGameElement.hidden = true;
       timerElement.hidden = false;
       randomStringElement.hidden = false;
+      winnerElement.hidden = true;
       gameOngoing = true;
     } else {
       startGameElement.hidden = false;
       timerElement.hidden = true;
       randomStringElement.hidden = true;
+      winnerElement.hidden = false;
       gameOngoing = false;
+      calculateWinner();
     }
   });
+  // For every time tick, update screen
   timerRef.on('value', function(snap) {
-    // var data = snap.val();
     timeLeft = snap.val();
     timerElement.textContent = timeLeft;
-    if(timeLeft > 1) {
-      startTimer(timeLeft);
-    }else {
-      timerElement.innerHTML = 'GAME OVER';
+    if(timeLeft <= 0) {
+      // timerElement.innerHTML = 'GAME OVER';
       gameOngoingRef.set(false);
     }
   });
+  // Onload, if game is running, get time data
+  timerRef.once('value', function(snap) {
+    timeLeft = snap.val();
+    timerElement.textContent = timeLeft;
+    if(timeLeft > 0) {
+      startTimer(timeLeft);
+    }
+  })
 }
 function calculateWinner() {
-  winnerElement.hidden = false;
+  var winner;
   var ref = db.ref('/validWords/');
-  //ref.orderByValue().limitToLast(1).once('value', function(snap) {
-
-    // var upperMsg = msg.toUpperCase();
-    // if(!snap.hasChild(upperMsg)) {
-    //   ref.child(upperMsg).set({
-    //     key: getUserID(),
-    //     name: getUserName(),
-    //     text: upperMsg
-    //   })
-    // } else {
-    //   console.log('Word is already in db');
-    //   var alreadySubmittedSnackbar = {
-    //     message: msg + ' has already been submitted, Try another word!',
-    //     timeout: 2000
-    //   };
-    //   signInSnackbarElement.MaterialSnackbar.showSnackbar(alreadySubmittedSnackbar);
-    // }
-  //})
-  var winner = '';
-  winnerElement.innerHTML = '';
+  var winnerArray = [];
+  ref.once('value').then(function(snap) {
+    console.log(snap.val());
+    snap.forEach(function(childSnap) {
+      console.log(childSnap.key);
+      console.log(childSnap.numChildren());
+      var snapObj = {name: childSnap.key, wordCount: childSnap.numChildren()};
+      winnerArray.push(snapObj);
+    })
+  }).then(function() {
+    console.log(winnerArray);
+    console.log(winnerArray.length);
+    if(winnerArray.length == 0) {
+      numberOfWords = 0;
+    }else {
+      var numberOfWords = Math.max.apply(Math, winnerArray.map(obj => obj.wordCount));
+    }
+    console.log(numberOfWords);
+    var filteredArray = winnerArray.filter(x => x.wordCount == numberOfWords).map(x => x.name);
+    console.log(filteredArray);
+    randomStringElement.hidden = false;
+    winnerElement.hidden = false;
+    winnerElement.innerHTML = 'Word Count: ' + numberOfWords;
+    if(filteredArray.length == 0) {
+      randomStringElement.innerHTML = '<p>No winner!!</p>';
+    }else{
+      randomStringElement.innerHTML = '<p>Winner: ' + filteredArray.join(' & ') + '</p>';
+    }
+    
+  });
 }
+function validLetters(word, array) {
+  console.log(word);
+  console.log(array);
+  var testArray = [...array];
+  // for(var i = testArray.length-1; i >= 0; i--) {
+  //   console.log(testArray);
+  //   console.log(testArray[i]);
+  //   console.log(word[0]);
+  //   if(testArray[i] === word[0]) {
+  //     console.log('FOUND REMOVE!!');
+  //     testArray.splice(i, 1);
+  //     word.splice(0,1);
+  //   }
+  //   if(word.length == 0) {
+  //     return true
+  //   }
+  //   console.log(testArray);
+  //   console.log(word);
+  // }
 
+  // var len = testArray.length;
+  // while(len--) {
+  //   for(var i = 0; i < word.length; i++ ){
+  //     console.log(word[i]);
+  //     console.log(testArray[len]);
+  //     if(testArray[len] == word[i]){
+  //       testArray.splice(len, 1);
+  //       console.log(testArray);
+  //     }
+  //   }
+  // }
+
+  // for(var i = word.length-1; i >= 0; i--) {
+  //   console.log(testArray);
+  //   if(word.length == 0 ) {
+  //     console.log('no more letters');
+  //   }else {
+  //     var foundIndex = testArray.findIndex(function(element) {
+  //       console.log(element);
+  //       console.log(word[i]);
+  //       return element == word[i];
+  //     });
+  //     console.log(foundIndex);
+  //     console.log(testArray[foundIndex]);
+  //     testArray.splice(foundIndex, 1, '');
+  //     console.log(testArray);
+  //   }
+  // }
+  console.log(testArray);
+  for(var i = 0; i < word.length; i++ ){
+    console.log(testArray);
+    var foundIndex = testArray.findIndex(function(element) {
+      console.log(element);
+      console.log(word[i]);
+      return element == word[i];
+    });
+    if(foundIndex == -1) {
+      console.log('return false because letter is not in array');
+      return false;
+    } else{
+      console.log(testArray);
+      testArray.splice(foundIndex, 1, '');
+      console.log('replace letter')
+      console.log(testArray);
+    }
+  }
+  console.log('return true because for loop finish');
+  return true;
+}
+function findLetter(element, word) {
+  return element == word;
+}
 function validWord(msg) {
   var word = msg.toUpperCase().split('');
   console.log(word);
+  console.log(randomArray);
+  //var testArray = randomArray;
+  //console.log(testArray);
+  console.log(validLetters(word, randomArray));
   for(var i = 0; i < word.length; i++) {
-    console.log(randomArray.includes(word[i]));
-    if(!randomArray.includes(word[i])) {
-      console.log('letters arent valid');
+    if(!validLetters(word, randomArray)) {
       var invalidLettersSnackbar = {
         message: "Answers must use the letters provided, Try Again!",
         timeout: 2000
@@ -191,22 +322,15 @@ function validWord(msg) {
       signInSnackbarElement.MaterialSnackbar.showSnackbar(invalidLettersSnackbar);
       return false;
     } else {
-      var repeatedLetter = word.some(function(current, index, array) {
-        console.log(current + ' : ' + array[index]);
-        return array.lastIndexOf(current) != index;
-      });
-      console.log(repeatedLetter);
-      if(repeatedLetter == true) {
-        console.log('There is a repeated letter');
-        var repeatedLetterSnackBar = {
-          message: "Answers cannot have repeated letters, Try Again!",
+      console.log(msg.toLowerCase());
+      if(allWords.words.some(e => e.aa === msg.toLowerCase()) == false) {
+        console.log('invalid word');
+        var invalidWordSnackBar = {
+          message: "Answers must be English words, Try Again!",
           timeout: 2000
         };
-        signInSnackbarElement.MaterialSnackbar.showSnackbar(repeatedLetterSnackBar);
+        signInSnackbarElement.MaterialSnackbar.showSnackbar(invalidWordSnackBar);
         return false;
-      } else {
-        console.log('No repeated letter');
-        return true;
       }
     }
   }
@@ -272,19 +396,6 @@ function addToOnlineList(uuid, username) {
   });
 }
 
-// function addToValidList(msg) {
-//   return db.ref('/validWords/').push({
-//     key: getUserID(),
-//     name: getUserName(),
-//     text: msg
-//   })
-//   .then(function() {
-//     console.log('ADDED TO VALID LIST', msg);
-//   }).catch(function(error) {
-//     console.error('Error adding to valid Word database', error);
-//   })
-// }
-
 function alreadySubmitted(msg) {
   var userRef = 'validWords/' + getUserName();
   var ref = db.ref(userRef);
@@ -296,7 +407,12 @@ function alreadySubmitted(msg) {
         key: getUserID(),
         name: getUserName(),
         text: upperMsg
-      })
+      });
+      db.ref('/Words/').push({
+        key: getUserID(),
+        name: getUserName(),
+        text: upperMsg
+      });
     } else {
       console.log('Word is already in db');
       var alreadySubmittedSnackbar = {
@@ -311,6 +427,8 @@ function alreadySubmitted(msg) {
 function onMessageFormSubmit(e) {
   e.preventDefault();
   var message = messageInputElement.value;
+  var isItValid = validWord(message);
+  console.log(isItValid);
   // Check that the user entered a message and is signed in.
   if (message && checkSignedInWithMessage()) {
     // Check if gaming is running
@@ -551,6 +669,7 @@ var startGameElement = document.getElementById('start-game');
 var randomStringElement = document.getElementById('letter-container');
 var timerElement = document.getElementById('timer');
 var winnerElement = document.getElementById('winner-container');
+var gameElement = document.getElementById('game-container');
 // Saves message on form submit.
 startGameElement.addEventListener('click', startGame);
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
@@ -566,6 +685,9 @@ messageInputElement.addEventListener('change', toggleButton);
 initFirebaseAuth();
 
 // We load currently existing chat messages and listen to new ones.
-loadMessages();
-refreshUserList();
-gameUpdate();
+// loadWordDB();
+window.onload = function() {
+  loadMessages();
+  refreshUserList();
+  gameUpdate();
+}

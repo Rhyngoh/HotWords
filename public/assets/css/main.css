@@ -13,17 +13,17 @@ main, #messages-card {
 }
 #game-container {
   height: 100%;
-  max-height: 400px;
+  max-height: 60%;
   position: relative;
 }
 #messages-card {
   margin-top: 15px;
-  max-height: 300px;
+  max-height: 30%;
 }
 #userlist-card {
   margin-top: 15px;
   padding: 8px;
-  max-height: 300px;
+  max-height: 30%;
 }
 #userlist-card span {
   font-size: 1.5rem;
@@ -186,12 +186,19 @@ main, #messages-card {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+.floating-text{
+  position: absolute;
+  font-size: 2.5rem;
+  z-index: 1;
+  text-shadow: 3px 3px #e0dbdb;
+}
 #timer {
   padding: 1rem;
 }
 #letter-container{
   display: flex;
   justify-content: center;
+  margin-top: 2rem;
 }
 #letter-container div{
   justify-content: space-between;
@@ -201,7 +208,19 @@ main, #messages-card {
   border: 1px solid black;
   background-color: white;
 }
-
+#letter-container p{
+  padding: 1.5rem;
+  font-size: 3rem;
+  margin: 10px;
+  background-color: white;
+}
+#winner-container {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%);
+  font-size: 2rem;
+}
 @media screen and (max-width: 610px) {
   header {
     height: 113px;
