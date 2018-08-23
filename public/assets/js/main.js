@@ -60,7 +60,6 @@ function generateLetters() {
   for(var k = 0; k < 2; k++){
     letters.push(possibleConsonants.charAt(Math.floor(Math.random() * possibleConsonants.length)));
   }
-  console.log(letters);
   return letters;
 }
 // Global random array so don't have to query db every time to check for this array
@@ -101,15 +100,14 @@ function startTimer(timeLeft) {
     // During game, check if message is 1 string, then check if letters are part of array
     if(timeLeft <= 0){
       clearInterval(gameTimer);
-      console.log('clear interval');
     }
   }, 1000);
 }
 function getRandomPosition(element) {
   var x = document.getElementById('game-container').clientWidth - 150;
-  var y = document.getElementById('game-container').clientHeight - 125;
+  var y = document.getElementById('game-container').clientHeight - 250;
   var randomX = Math.floor(Math.random()*x);
-  var randomY = 100 + Math.floor(Math.random()*y);
+  var randomY = 125 + Math.floor(Math.random()*y);
   return [randomX, randomY];
 }
 function gameUpdate() {
@@ -121,7 +119,6 @@ function gameUpdate() {
   randomLetterRef.on('value', function(snap) {
     randomStringElement.innerHTML = '';
     randomArray = snap.val();
-    console.log(snap.val());
     for(var i = 0; i < randomArray.length; i++) {
       var randomLetter = document.createElement('div');
       randomLetter.innerHTML = randomArray[i];
@@ -129,9 +126,6 @@ function gameUpdate() {
     }
   });
   db.ref('/Words/').on('child_added', function(snap) {
-    console.log(snap);
-    console.log(snap.val());
-    console.log(snap.val().text);
     var floatingText = document.createElement('div');
     floatingText.classList.add('floating-text');
     floatingText.innerHTML = snap.val().text;
@@ -141,17 +135,7 @@ function gameUpdate() {
     floatingText.style.top = xy[1] + 'px';
 
   });
-  // db.ref('/Words/').once('value').then(function(snap) {
-  //   snap.forEach(function(childSnap) {
-  //     console.log(childSnap.val().text);
-  //     var floatingText = document.createElement('div');
-  //     floatingText.classList.add('floating-text');
-  //     floatingText.innerHTML = snap.val().text;
-  //     gameElement.appendChild(floatingText);
-  //   })
-  // });
   ref.once('value').then(function(snap){
-    console.log(snap.val().gameOngoing);
     if(snap.val().gameOngoing == true) {
       timeLeft = snap.val().timer;
       startGameElement.hidden = true;
@@ -166,7 +150,6 @@ function gameUpdate() {
     }
   });
   gameOngoingRef.on('value', function(snap) {
-    console.log(snap.val());
     if(snap.val() == true) {
       startGameElement.hidden = true;
       timerElement.hidden = false;
@@ -205,24 +188,17 @@ function calculateWinner() {
   var ref = db.ref('/validWords/');
   var winnerArray = [];
   ref.once('value').then(function(snap) {
-    console.log(snap.val());
     snap.forEach(function(childSnap) {
-      console.log(childSnap.key);
-      console.log(childSnap.numChildren());
       var snapObj = {name: childSnap.key, wordCount: childSnap.numChildren()};
       winnerArray.push(snapObj);
     })
   }).then(function() {
-    console.log(winnerArray);
-    console.log(winnerArray.length);
     if(winnerArray.length == 0) {
       numberOfWords = 0;
     }else {
       var numberOfWords = Math.max.apply(Math, winnerArray.map(obj => obj.wordCount));
     }
-    console.log(numberOfWords);
     var filteredArray = winnerArray.filter(x => x.wordCount == numberOfWords).map(x => x.name);
-    console.log(filteredArray);
     randomStringElement.hidden = false;
     winnerElement.hidden = false;
     winnerElement.innerHTML = 'Word Count: ' + numberOfWords;
@@ -235,84 +211,21 @@ function calculateWinner() {
   });
 }
 function validLetters(word, array) {
-  console.log(word);
-  console.log(array);
   var testArray = [...array];
-  // for(var i = testArray.length-1; i >= 0; i--) {
-  //   console.log(testArray);
-  //   console.log(testArray[i]);
-  //   console.log(word[0]);
-  //   if(testArray[i] === word[0]) {
-  //     console.log('FOUND REMOVE!!');
-  //     testArray.splice(i, 1);
-  //     word.splice(0,1);
-  //   }
-  //   if(word.length == 0) {
-  //     return true
-  //   }
-  //   console.log(testArray);
-  //   console.log(word);
-  // }
-
-  // var len = testArray.length;
-  // while(len--) {
-  //   for(var i = 0; i < word.length; i++ ){
-  //     console.log(word[i]);
-  //     console.log(testArray[len]);
-  //     if(testArray[len] == word[i]){
-  //       testArray.splice(len, 1);
-  //       console.log(testArray);
-  //     }
-  //   }
-  // }
-
-  // for(var i = word.length-1; i >= 0; i--) {
-  //   console.log(testArray);
-  //   if(word.length == 0 ) {
-  //     console.log('no more letters');
-  //   }else {
-  //     var foundIndex = testArray.findIndex(function(element) {
-  //       console.log(element);
-  //       console.log(word[i]);
-  //       return element == word[i];
-  //     });
-  //     console.log(foundIndex);
-  //     console.log(testArray[foundIndex]);
-  //     testArray.splice(foundIndex, 1, '');
-  //     console.log(testArray);
-  //   }
-  // }
-  console.log(testArray);
   for(var i = 0; i < word.length; i++ ){
-    console.log(testArray);
     var foundIndex = testArray.findIndex(function(element) {
-      console.log(element);
-      console.log(word[i]);
       return element == word[i];
     });
     if(foundIndex == -1) {
-      console.log('return false because letter is not in array');
       return false;
     } else{
-      console.log(testArray);
       testArray.splice(foundIndex, 1, '');
-      console.log('replace letter')
-      console.log(testArray);
     }
   }
-  console.log('return true because for loop finish');
   return true;
-}
-function findLetter(element, word) {
-  return element == word;
 }
 function validWord(msg) {
   var word = msg.toUpperCase().split('');
-  console.log(word);
-  console.log(randomArray);
-  //var testArray = randomArray;
-  //console.log(testArray);
-  console.log(validLetters(word, randomArray));
   for(var i = 0; i < word.length; i++) {
     if(!validLetters(word, randomArray)) {
       var invalidLettersSnackbar = {
@@ -322,9 +235,7 @@ function validWord(msg) {
       signInSnackbarElement.MaterialSnackbar.showSnackbar(invalidLettersSnackbar);
       return false;
     } else {
-      console.log(msg.toLowerCase());
       if(allWords.words.some(e => e.aa === msg.toLowerCase()) == false) {
-        console.log('invalid word');
         var invalidWordSnackBar = {
           message: "Answers must be English words, Try Again!",
           timeout: 2000
@@ -335,31 +246,6 @@ function validWord(msg) {
     }
   }
   return true;
-}
-function repeatedLetters(text, index) {
-  if((text.length - index) == 0) {
-    return false;
-  } else {
-    console.log(repeatedLetters(text, index + 1));
-    console.log(text.substr(0, index).indexOf(text[index]));
-    return repeatedLetters(text, index + 1) || text.substr(0, index).indexOf(text[index])!=-1;
-  }
-}
-// Save messaging device token to datastore
-function saveMessagingDeviceToken() {
-  firebase.messaging().getToken().then(function(currentToken) {
-    if (currentToken) {
-      console.log('Got FCM device token:', currentToken);
-      // Saving the Device Token to the datastore.
-      firebase.database().ref('/fcmTokens').child(currentToken)
-          .set(firebase.auth().currentUser.uid);
-    } else {
-      // Need to request permissions to show notifications.
-      requestNotificationsPermissions();
-    }
-  }).catch(function(error){
-    console.error('Unable to get messaging token.', error);
-  });
 }
 
 // load chat message and listen for new messages
@@ -399,7 +285,6 @@ function addToOnlineList(uuid, username) {
 function alreadySubmitted(msg) {
   var userRef = 'validWords/' + getUserName();
   var ref = db.ref(userRef);
-  console.log(ref);
   ref.once('value', function(snap) {
     var upperMsg = msg.toUpperCase();
     if(!snap.hasChild(upperMsg)) {
@@ -414,7 +299,6 @@ function alreadySubmitted(msg) {
         text: upperMsg
       });
     } else {
-      console.log('Word is already in db');
       var alreadySubmittedSnackbar = {
         message: msg + ' has already been submitted, Try another word!',
         timeout: 2000
@@ -428,25 +312,16 @@ function onMessageFormSubmit(e) {
   e.preventDefault();
   var message = messageInputElement.value;
   var isItValid = validWord(message);
-  console.log(isItValid);
   // Check that the user entered a message and is signed in.
   if (message && checkSignedInWithMessage()) {
     // Check if gaming is running
     if(gameOngoing == true) {
-      console.log('Game ongoing');
       //Check if string is one word (no spaces)
       if(message.includes(' ') == false) {
-        console.log('No spaces!');
-        console.log(validWord(message));
         if(validWord(message) == true) {
-          console.log(message);
-          console.log('valid word');
           alreadySubmitted(message);
-        }else {
-          console.log('not valid');
         }
-      }else{
-        console.log('I HAVE A SPACE');
+      } else {
         var spaceSnackbar = {
           message: "Answers can't have any spaces, Try Again!",
           timeout: 2000
@@ -454,7 +329,6 @@ function onMessageFormSubmit(e) {
         signInSnackbarElement.MaterialSnackbar.showSnackbar(spaceSnackbar);
       }
     }
-    console.log(message);
     saveMessage(message).then(function() {
       // Clear message text field and re-enable the SEND button.
       resetMaterialTextfield(messageInputElement);
@@ -499,8 +373,6 @@ function authStateObserver(user) {
     signInButtonElement.setAttribute('hidden', 'true');
     signInButtonAnon.setAttribute('hidden', 'true');
 
-    // We save the Firebase Messaging Device token and enable notifications.
-    // saveMessagingDeviceToken();
   } else { // User is signed out!
     // Hide user's profile and sign-out button.
 
