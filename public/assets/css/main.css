@@ -5,9 +5,22 @@ main, #messages-card {
   height: 100%;
   padding-bottom: 0;
 }
-
+#rules-container {
+  margin-top: 2rem;
+}
+#rules-container p {
+  font-size: 1.5rem;
+  padding: 1rem;
+}
+#rules-container ul {
+  font-size:1.5rem;
+}
+#rules-container li {
+  font-size: 1rem;
+}
 #messages-card-container {
-  height: calc(100% - 35px);
+  /*height: calc(100% - 35px);*/
+  height:35vh;
   padding-bottom: 0;
   padding-top: 0;
 }
@@ -18,12 +31,12 @@ main, #messages-card {
 }
 #messages-card {
   margin-top: 15px;
-  max-height: 30%;
+  /*max-height: 30%;*/
 }
 #userlist-card {
   margin-top: 15px;
   padding: 8px;
-  max-height: 30%;
+  /*max-height: 30%;*/
 }
 #userlist-card span {
   font-size: 1.5rem;
@@ -178,6 +191,10 @@ main, #messages-card {
 }
 #start-game {
   width: fit-content;
+  font-size: 2rem;
+  border-radius: 10px;
+  padding: 1rem 2rem;
+  height: auto;
 }
 #game-container #start-game, #timer {
   margin: 0;
